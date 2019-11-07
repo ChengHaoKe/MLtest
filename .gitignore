@@ -3,4 +3,4 @@
 *.pickle
 __pycache__
 __pycache__/*
-modelfiles/
+modelfiles/*

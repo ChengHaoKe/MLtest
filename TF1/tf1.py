@@ -5,18 +5,27 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
+# define functions because pycharm doesn't locate them
 Dense = tf.keras.layers.Dense
 Flatten = tf.keras.layers.Flatten
 Conv2D = tf.keras.layers.Conv2D
-mnist = tf.keras.datasets.mnist
+BatchNormalization = tf.keras.layers.BatchNormalization
+EarlyStopping = tf.keras.callbacks.EarlyStopping
 
+# get data from online
+mnist = tf.keras.datasets.mnist
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
 train_data = x_train.reshape(x_train.shape[0], 28, 28, 1)
 test_data = x_test.reshape(x_test.shape[0], 28, 28, 1)
 
+# create model
 model = tf.keras.Sequential()
 model.add(Conv2D(10, kernel_size=2, activation='relu', input_shape=(28, 28, 1)))
+# # Add a dropout layer
+# model.add(Dropout(0.2))
+# Add batch normalization layer
+model.add(BatchNormalization())
 model.add(Conv2D(10, kernel_size=2, activation='relu'))
 model.add(Flatten())
 model.add(Dense(10, activation='softmax'))
@@ -27,17 +36,24 @@ model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
 
+# Define early_stopping_monitor
+early_stopping_monitor = EarlyStopping(patience=2)
+
 # Fit to training data
-training = model.fit(train_data, y_train, validation_split=0.2, epochs=3, batch_size=10)
+training = model.fit(train_data, y_train, validation_split=0.2, epochs=5, batch_size=10,
+                     callbacks=[early_stopping_monitor])
 
 # Extract the history from the training object
 history = training.history
 
 # Plot the training loss
-plt.plot(history['loss'])
+plt.plot(history['loss'], label='Training Loss')
 # Plot the validation loss
-plt.plot(history['val_loss'])
-
+plt.plot(history['val_loss'], label='Validation Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.title('Model Training and Validation Loss')
 # Show the figure
 plt.show()
 
@@ -54,5 +70,14 @@ mwei4 = mwei0[3]
 mwei5 = mwei0[4]
 mwei6 = mwei0[5]
 
-# save model or weights
-model.save('')
+# predict images
+# convert to float 32
+image = tf.cast(test_data[0:3], tf.float32)
+model.predict(image)
+
+# # save model
+# model.save('/Users/ch.ke/GitHub/MLtest/modelfiles/tf1.h5')
+# # model = tf.keras.models.load_model('/Users/ch.ke/GitHub/MLtest/modelfiles/tf1.h5')
+# # save weights
+# model.save_weights('/Users/ch.ke/GitHub/MLtest/modelfiles/tf1weights.h5')
+# # model.load_weights('Users/ch.ke/GitHub/MLtest/modelfiles/tf1weights.h5')
