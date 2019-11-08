@@ -75,6 +75,18 @@ mwei6 = mwei0[5]
 image = tf.cast(test_data[0:3], tf.float32)
 model.predict(image)
 
+
+# plot images
+def imgplt(num):
+    x1 = test_data[num].reshape(test_data[num].shape[0], test_data[num].shape[1])
+    plt.imshow(x1)
+    plt.show()
+
+
+imgplt(0)
+imgplt(1)
+imgplt(2)
+
 # # save model
 # model.save('/Users/ch.ke/GitHub/MLtest/modelfiles/tf1.h5')
 # # model = tf.keras.models.load_model('/Users/ch.ke/GitHub/MLtest/modelfiles/tf1.h5')
