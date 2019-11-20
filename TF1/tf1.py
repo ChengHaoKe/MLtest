@@ -73,7 +73,7 @@ mwei6 = mwei0[5]
 # predict images
 # convert to float 32
 image = tf.cast(test_data[0:3], tf.float32)
-model.predict(image)
+y = model.predict(image)
 
 
 # plot images
