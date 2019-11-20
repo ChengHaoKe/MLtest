@@ -1,22 +1,33 @@
 import tensorflow as tf
-from os import path
+from datetime import datetime
+import time
 import os
 # remove warning for cpu
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
+# Introduction to TensorFlow for Artificial Intelligence, Machine Learning, and Deep Learning W3 in 2.0
 def train_mnist(data=True):
+    start_time = time.time()
+
     print(tf.__version__)
     if data:
         # get data from online
+        print('Loading data from online source')
         mnist = tf.keras.datasets.mnist
         (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
+    # custom callback function
     class mycallback(tf.keras.callbacks.Callback):
-        def on_epoch_end(self, epoch, logs={}):
-            if logs.get('acc') >= 0.99:
-                print('\nReached 99% accuracy so cancelling training!')
-                self.model.stop_training = True
+        def on_epoch_end(self, epoch, logs=None):
+            print('\nTraining: epoch {} ends at {}'.format(epoch, datetime.now()))
+            try:
+                if logs.get('accuracy') >= 0.99:
+                    print('\nReached 99% accuracy so cancelling training!')
+                    self.model.stop_training = True
+            except TypeError:
+                print(logs)
+                raise  # re-raise exception
 
     callbacks = mycallback()
 
@@ -43,10 +54,14 @@ def train_mnist(data=True):
 
     # Evaluate on test data
     x = model.evaluate(x_test, y_test, batch_size=10)
-    print(x)
+    print('Model loss:', x[0], ' Model accuracy:', x[1])
+
+    print("Function ran for: {0} seconds ({1} mins)".format(str(round(time.time() - start_time, 2)),
+                                                            str(round((time.time() - start_time) / 60))))
 
     # model fitting
-    return history.epoch, history.history['acc'][-1]
+    return history.epoch, history.history['accuracy'][-1]
 
 
 train_mnist()
+# train_mnist(data=False)
